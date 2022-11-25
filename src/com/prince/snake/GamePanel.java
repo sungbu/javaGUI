@@ -16,12 +16,15 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
     int[] snakeY = new int[600]; //蛇的Y坐标  25*25
     String fx; //头方向
     boolean isStart = false; //游戏默认不开始
+    boolean isFinal = false; //游戏是否结束
 
     Timer timer = new Timer(100,this); //100毫秒执行一次
 
     //食物坐标
     int foodx;
     int foody;
+
+    int score; //成绩
     java.util.Random random = new java.util.Random();
 
 
@@ -43,6 +46,8 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
         snakeX[2] = 50;snakeY[2] = 100;//身体2坐标
         fx = "R"; //初始头方向右
 
+        score = 0; //成绩初始化
+
         //把食物随机分布在界面上
         foodx = 25 + 25 * random.nextInt(34);
         foody = 75 + 25 * random.nextInt(24);
@@ -62,6 +67,18 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
 
         g.fillRect(25, 75, 850, 600);//默认的游戏界面
 
+
+        //画积分
+        g.setColor(Color.black);
+        g.setFont(new Font("微软雅黑",Font.BOLD,18));
+        g.drawString("长度" + length, 750, 35);
+        g.drawString("分数" + score, 750, 60);
+
+
+        
+        //画食物
+        Data.food.paintIcon(this, g, foodx, foody);
+
         //画蛇
         if(fx.equals("R")){
             Data.right.paintIcon(this, g, snakeX[0], snakeY[0]);
@@ -73,8 +90,6 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
             Data.down.paintIcon(this, g, snakeX[0], snakeY[0]);
         }
 
-        //画食物
-        Data.food.paintIcon(this, g, foodx, foody);
 
         for(int i = 1; i < length; i ++){
             Data.body.paintIcon(this, g, snakeX[i], snakeY[i]);
@@ -86,6 +101,12 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
             g.setFont(new Font("微软雅黑",Font.BOLD,40));
             g.drawString("按下空格开始游戏", 300, 300);
         }
+
+        if(isFinal){
+            g.setColor(Color.red);
+            g.setFont(new Font("微软雅黑",Font.BOLD,40));
+            g.drawString("失败,按下空格重新开始", 300, 300);
+        }
     }
 
     //键盘监听事件
@@ -94,7 +115,13 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
         int keyCode = e.getKeyCode();
 
         if(keyCode == KeyEvent.VK_SPACE){
-            isStart = ! isStart;
+            if(isFinal){
+                //重新开始
+                isFinal = false;
+                init();
+            }else{
+                isStart = ! isStart;
+            }
             repaint();
         }
 
@@ -123,11 +150,13 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
     //事件监听 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(isStart){ //如果游戏是开始状态，蛇动
+        if(isStart && !isFinal){ //如果游戏是开始状态，蛇动
 
             //吃食物
             if(snakeX[0] == foodx && snakeY[0] == foody){
                 length ++;
+                //分数+1
+                score += 10;
                 //再次随机食物
                 foodx = 25 + 25 * random.nextInt(34);
                 foody = 75 + 25 * random.nextInt(24);
@@ -161,6 +190,13 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
                 //边界判断
                 if(snakeY[0] < 75) snakeY[0] = 650;
             
+            }
+
+            //失败判定  撞到自己
+            for(int i = 1; i < length; i ++){
+                if(snakeX[0] == snakeX[i] && snakeY[0] == snakeY[i]){
+                    isFinal = true;
+                }
             }
             
             
