@@ -18,6 +18,13 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
     boolean isStart = false; //游戏默认不开始
 
     Timer timer = new Timer(100,this); //100毫秒执行一次
+
+    //食物坐标
+    int foodx;
+    int foody;
+    java.util.Random random = new java.util.Random();
+
+
     //构造器
     GamePanel() {
         init();
@@ -35,6 +42,10 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
         snakeX[1] = 75;snakeY[1] = 100;//身体1坐标
         snakeX[2] = 50;snakeY[2] = 100;//身体2坐标
         fx = "R"; //初始头方向右
+
+        //把食物随机分布在界面上
+        foodx = 25 + 25 * random.nextInt(34);
+        foody = 75 + 25 * random.nextInt(24);
     }
 
 
@@ -61,6 +72,9 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
         }else if (fx.equals("D")){
             Data.down.paintIcon(this, g, snakeX[0], snakeY[0]);
         }
+
+        //画食物
+        Data.food.paintIcon(this, g, foodx, foody);
 
         for(int i = 1; i < length; i ++){
             Data.body.paintIcon(this, g, snakeX[i], snakeY[i]);
@@ -110,6 +124,16 @@ public class GamePanel extends JPanel implements KeyListener,ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(isStart){ //如果游戏是开始状态，蛇动
+
+            //吃食物
+            if(snakeX[0] == foodx && snakeY[0] == foody){
+                length ++;
+                //再次随机食物
+                foodx = 25 + 25 * random.nextInt(34);
+                foody = 75 + 25 * random.nextInt(24);
+
+            }
+
             //移动
             for(int i = length - 1; i > 0; i --){ //后一节移到前一节的位置
                 snakeX[i] = snakeX[i - 1];
