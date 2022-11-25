@@ -3,11 +3,12 @@ package com.prince.snake;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.*;
 
 import javax.swing.*;
 
 //游戏面板
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements KeyListener {
 
     //定义蛇的数据结构
     int length;
@@ -18,6 +19,10 @@ public class GamePanel extends JPanel {
     //构造器
     GamePanel() {
         init();
+        //获得焦点和键盘事件
+        this.setFocusable(true);
+        this.addKeyListener(this); //获取键盘监听事件
+
     }
 
     //初始化方法
@@ -65,4 +70,27 @@ public class GamePanel extends JPanel {
             g.drawString("按下空格开始游戏", 300, 300);
         }
     }
+
+    //键盘监听事件
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+
+        if(keyCode == KeyEvent.VK_SPACE){
+            isStart = ! isStart;
+            repaint();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        
+    }
+
 }
+
